@@ -8,9 +8,10 @@ Hello and welcome to Tara's github.
    /data and /output folders in the same working directory as your
    R project file (`coral-econ.proj`).
 2. Copy all files from the `/data` folder into your working directory.
-   This provides the model with starting conditions related to 
-   If you will be changing the underlying data
-4. Run `model_v3.R`.
+   This provides the model with starting conditions of each reef.
+   If you will be changing the underlying data, make sure to follow
+   the dataset structure of headers; otherwise, the model will not run.
+3. Run `model_v3.R`.
 
 #### Running the script will:
 * pull from the data files in `/data`
