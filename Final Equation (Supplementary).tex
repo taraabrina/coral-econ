@@ -1,0 +1,79 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+
+\section*{Hard Coral Cover Model}
+
+
+
+\subsection*{Equation 1}
+
+\begin{equation*}
+C_t^{i} = \min\!\Bigl(K^{i},\ \max\!\bigl(0,\ (C_{t-1}^{i} + G_t^{i} + S_t^{i})(1-m^{i})\bigr)\Bigr)
+\end{equation*}
+
+with the growth and recruitment terms
+\begin{align*}
+G_t^{i} &= \max\!\bigl(0,\,r^{i}(1-g^{i})\bigr)\,C_{t-1}^{i}\Bigl(1-\frac{C_{t-1}^{i}}{K^{i}}\Bigr), \\[4pt]
+S_t^{i} &= \frac{100\,\mu\,c}{A^{i}}
+   \Bigl(\sum_{j} p_{j\to i}\,\Lambda_{t-1}^{\,j}\Bigr)
+   \Bigl(1-\frac{C_{t-1}^{i}}{K^{i}}\Bigr),
+\end{align*}
+
+the larval supply
+\begin{equation*}
+\Lambda_{t-1}^{\,j} = L\,C_{t-1}^{j}
++ R\cdot \mathbf{1}\{\,t=1,\ j\in\mathcal{T}\,\},
+\end{equation*}
+
+and the mortality fraction (capped in code)
+\begin{equation*}
+m^{i} = \min\!\Bigl(0.95,\
+P^{i,\mathrm{Typh}}\mathrm{mort}^{i,\mathrm{Typh}}
++ P^{i,\mathrm{Ble}}\mathrm{mort}^{i,\mathrm{Ble}}\Bigr).
+\end{equation*}
+\subsection*{Term Definitions}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{>{$}c<{$} l l}
+\toprule
+\textbf{Symbol} & \textbf{Code variable} & \textbf{Definition} \\
+\midrule
+C_t^{i}            & \texttt{current\_hcc}      & Hard coral cover of reef $i$ at step $t$ \\
+C_{t-1}^{i}        & \texttt{current\_hcc}      & HCC of reef $i$ in the previous step \\
+C_{t-1}^{j}        & ---                        & HCC of source reef $j$ in the previous step \\
+G_t^{i}            & \texttt{growth}            & Logistic growth term for reef $i$ at step $t$ \\
+S_t^{i}            & \texttt{recruit}           & Recruitment (settled larvae) term for reef $i$ \\
+r^{i}              & \texttt{R\_GROW}           & Intrinsic growth rate (by reef type) \\
+g^{i}              & \texttt{PENALTY}/\texttt{p\_vec} & Gravity penalty on growth (code only), $0\le g^i\le 1$ \\
+K^{i},\,K^{\tau}   & \texttt{K\_VALS}           & Carrying capacity / max HCC for reef type $\tau$ \\
+m^{i}              & \texttt{EXP\_MORT}         & Expected mortality fraction (rate on standing cover) \\
+M^{i,\mathrm{Typh}} & ---                       & Expected HCC lost to typhoons $=P^{Typh}\mathrm{mort}^{Typh}C_{t-1}^{i}$ \\
+M^{i,\mathrm{Ble}} & ---                        & Expected HCC lost to bleaching $=P^{Ble}\mathrm{mort}^{Ble}C_{t-1}^{i}$ \\
+P^{i,\mathrm{Typh}} & \texttt{typhprob}         & Typhoon probability at reef $i$ \\
+P^{i,\mathrm{Ble}} & \texttt{bleachprob}        & Bleaching probability at reef $i$ \\
+\mathrm{mort}^{i,\mathrm{Typh}} & \texttt{typhmort} & Per-event typhoon mortality fraction \\
+\mathrm{mort}^{i,\mathrm{Ble}}  & \texttt{bleachmort} & Per-event bleaching mortality fraction \\
+p_{j\to i}         & \texttt{P\_T} entry        & Settlement probability, source $j$ to sink $i$ \\
+L^{\,j\to i}       & ---                        & Larvae received by $i$ from $j$ (photo term) \\
+\Lambda_{t-1}^{\,j} & \texttt{larvae}           & Larval supply from source $j$ (code term) \\
+A^{i}              & \texttt{AREA}              & Area of reef $i$ (km$^2$) \\
+L                  & \texttt{LARVAE\_PER\_HCC}  & Larvae per unit HCC $=10^{6}$ \\
+\mu                & \texttt{MATURITY\_RATE}    & Maturity/settlement coefficient $=0.09$ \\
+c                  & \texttt{COLONY\_TO\_KMSQ}  & Colony-to-area conversion $=2\times10^{-10}$ \\
+R                  & \texttt{RESTORATION\_LARVAE} & Restoration pulse $=1.4\times10^{9}$ (at $t=1$, targets) \\
+\mathcal{T}        & \texttt{target\_indices}   & Set of targeted reefs \\
+\mathbf{1}\{\cdot\} & ---                       & Indicator: $1$ if condition true, else $0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+
+\end{document}
