@@ -1,2 +1,2 @@
 # coral-econ
-Coral reef restoration economics
+Modeling coral reef restoration outcomes for economic analysis
