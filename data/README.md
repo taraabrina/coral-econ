@@ -33,3 +33,7 @@
 * Percent contribution to average HCC of reef type
 * Bleaching Mortality Rate of TAU (Expected mortality rate after DHW > 8)
 * Typhoon Mortality Rate of TAU (Expected mortality rate after typhoon winds > 118 kmph within 500 km)
+4. type.csv - reef type summaries
+* Reef Type
+* Maximum HCC (hacc)
+* Growth rate (mm per year)
