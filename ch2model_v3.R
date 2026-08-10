@@ -1,5 +1,5 @@
 # ==============================================================================
-# v3.31  - Active restoration adds larvae directly as settled at target reef
+# v3.32  - Active restoration adds larvae directly as settled at target reef
 #         (bypasses dispersal; 100% stays at reef); year 1 only (LINE 99)
 #       - 140 M restoration larvae from 1 billion 
 #       - calibrating juvenile densities (6.9 ind m2 from GBR -> 6.12 ± 0.56 ind m2) 
