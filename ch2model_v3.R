@@ -1,11 +1,10 @@
 # ==============================================================================
-# v3.32  - Active restoration adds larvae directly as settled at target reef
+# v3.31  - Active restoration adds larvae directly as settled at target reef
 #         (bypasses dispersal; 100% stays at reef); year 1 only (LINE 99)
 #       - 140 M restoration larvae from 1 billion 
 #       - calibrating juvenile densities (6.9 ind m2 from GBR -> 6.12 ± 0.56 ind m2) 
-#           -> maturity 9%, larvae per hcc 100M, 2 cm2 larvae area
-#       - changed passive to management on plot
-#       - add bioregion to output table, with left join
+#           -> maturity 9%, larvae per hcc 10M, 5 cm2 larvae area
+#       - add bioregion to output table
 # ==============================================================================
 
 if (!require(dplyr)) install.packages("dplyr"); library(dplyr)
@@ -22,7 +21,7 @@ if (!require(doParallel)) install.packages("doParallel"); library(doParallel)
 # ==============================================================================
 # LOAD DATA
 # ==============================================================================
-version <- 3.32
+version <- 3.31
 data_path <- "data/"
 nodes <- read.csv(paste(data_path,"centroid.csv",sep="")) #2404 ReefIDs with HCC, reef area, type, gravity penalty, mortality rate
 edges <- read.csv(paste(data_path,"sourcesink.csv",sep="")) #full ReefID source-sink pairs with settlement probabilities
@@ -64,13 +63,15 @@ nodes_final <- bind_rows(nodes, international_nodes) %>% left_join(reef_params, 
 # List reefs for group intervention
 preselected_ids <- c("1228", "2768", "2122", "3428", 
                      "1558", "1967", "908", "2697", 
-                     "3476", "3199") #default top 10 active resto candidates
+                     "3476", "3199", "2157", "1908",
+                     "2638", "2690", "2912", "2704",
+                     "1355", "3480", "2620", "2386") #default top 20 active resto candidates
 
 #OR from a file:
+
 #preselected_ids <- preselect |>
 #  filter(act. > 0) |> #here choose act., pass., or comb.
 #  pull(reefid)
-
 target_indices <- which(nodes_final$reefid %in% preselected_ids)
 
 # ==============================================================================
@@ -92,9 +93,9 @@ EXP_MORT  <- pmin(0.95, (V(coral_graph)$typhprob * V(coral_graph)$typhmort) +
                     (V(coral_graph)$bleachprob * V(coral_graph)$bleachmort))
 
 # Constants
-LARVAE_PER_HCC     <- 100000 #note HCC 0-100, so actually 100M
+LARVAE_PER_HCC     <- 10000 #note HCC 0-100, so actually 10M
 MATURITY_RATE      <- 0.09
-COLONY_TO_KMSQ     <- 0.0000000002
+COLONY_TO_KMSQ     <- 0.0000000002 #changed from 2cm to 5cm (Trapon)
 STEPS              <- 25
 RESTORATION_LARVAE <- 1.4e8 #e7
 
@@ -262,11 +263,11 @@ annual_ph_recruit_df <- data.frame(
 
 # indiv_reefgain_df transform for visualization
 indiv_reefgain_long <- indiv_reefgain_df %>%
-  dplyr::select(reefid, active_gain, passive_gain, combined_gain) %>%
+  select(reefid, active_gain, passive_gain, combined_gain) %>%
   pivot_longer(-reefid, names_to = "intervention", values_to = "gain") %>%
-  dplyr::mutate(intervention = dplyr::recode(intervention,
+  mutate(intervention = recode(intervention,
     active_gain   = "S2 Active",
-    passive_gain  = "S3 Management",
+    passive_gain  = "S3 Passive",
     combined_gain = "S4 Combined"
   ))
 
@@ -322,12 +323,11 @@ group_reefgain_target_boxplot <- ggplot(group_reefgain_targeted, aes(x = interve
        y = paste0("HCC Gain (Yr ", STEPS, ")")) +
   theme_minimal()
 
+
 print(group_reefgain_ph_boxplot)
 print(group_reefgain_target_boxplot)
 
-#indiv_reefgain_df$bioregion = nodes$bioregion
-indiv_reefgain_df <- indiv_reefgain_df %>%
-  left_join(nodes %>% dplyr::select(reefid, bioregion), by = "reefid")
+indiv_reefgain_df$bioregion = nodes$bioregion
 
 # ==============================================================================
 # EXPORT
